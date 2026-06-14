@@ -1,0 +1,284 @@
+Enter password: *********
+Welcome to the MySQL monitor.  Commands end with ; or \g.
+Your MySQL connection id is 16
+Server version: 8.0.46 MySQL Community Server - GPL
+
+Copyright (c) 2000, 2026, Oracle and/or its affiliates.
+
+Oracle is a registered trademark of Oracle Corporation and/or its
+affiliates. Other names may be trademarks of their respective
+owners.
+
+Type 'help;' or '\h' for help. Type '\c' to clear the current input statement.
+
+mysql> USE StudentServicesDB;
+Database changed
+mysql> SHOW DATABASES;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| studentservicesdb  |
+| sys                |
++--------------------+
+5 rows in set (0.01 sec)
+
+mysql> CREATE TABLE Departments(department_id INT PRIMARY KEY, department_name VARCHAR(100) NOT NULL, location_block VARCHAR(50) NOT NULL, head_of_department VARCHAR(100) NOT NULL);
+ERROR 1050 (42S01): Table 'departments' already exists
+mysql> INSERT INTO Departments(department_id, department_name, location_block, head_of_department)VALUES
+    -> (1, 'Computer Science', 'Block A', 'Dr. Jane Smith'),
+    -> (2, 'Business Studies', 'Block B', 'Prof. John Doe'),
+    -> (3, 'Engineering', 'Block C', 'Dr. Robert Johnson'),
+    -> (4, 'Hospitality', 'Block D', 'Ms. Mary Williams'),
+    -> (5, 'Applied Sciences', 'Block E', 'Dr. Peter Brown');
+Query OK, 5 rows affected (0.04 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql> SELECT * FROM Departments;
++---------------+------------------+----------------+--------------------+
+| department_id | department_name  | location_block | head_of_department |
++---------------+------------------+----------------+--------------------+
+|             1 | Computer Science | Block A        | Dr. Jane Smith     |
+|             2 | Business Studies | Block B        | Prof. John Doe     |
+|             3 | Engineering      | Block C        | Dr. Robert Johnson |
+|             4 | Hospitality      | Block D        | Ms. Mary Williams  |
+|             5 | Applied Sciences | Block E        | Dr. Peter Brown    |
++---------------+------------------+----------------+--------------------+
+5 rows in set (0.00 sec)
+
+mysql> CREATE TABLE Students(student_id INT PRIMARY KEY AUTO_INCREMENT,
+    -> first_name VARCHAR(50) NOT NULL,
+    -> last_name VARCHAR(50) NOT NULL,
+    -> date_of_birth DATE NOT NULL,
+    -> gender VARCHAR(10) CHECK(gender IN ('M', 'F', 'other')),
+    -> address TEXT,
+    -> phone VARCHAR(15),
+    -> email VARCHAR(100) UNIQUE,
+    -> enrollment_status VARCHAR(20) DEFAULT 'in session');
+Query OK, 0 rows affected (0.13 sec)
+
+mysql> INSERT INTO Students (first_name, last_name, date_of_birth, gender, address, phone, email, enrollment_status) VALUES
+    -> ('Alice', 'Wanjiku', '2000-05-15', 'F', '123 Nairobi', '0712345678', 'alice@student.com', 'in session'),
+    -> ('Bob', 'Otieno', '2001-03-20', 'M', '45 Kisumu', '0723456789', 'bob@student.com', 'in session'),
+    -> ('Carol', 'Muthoni', '1999-11-10', 'F', '78 Mombasa', '0734567890', 'carol@student.com', 'on attachment'),
+    -> ('David', 'Kimani', '2000-07-25', 'M', '90 Nakuru', '0745678901', 'david@student.com', 'completed'),
+    -> ('Emma', 'Achieng', '2001-09-30', 'F', '12 Eldoret', '0756789012', 'emma@student.com', 'in session'),
+    -> ('Frank', 'Omondi', '2000-01-05', 'M', '34 Thika', '0767890123', 'frank@student.com', 'on attachment'),
+    -> ('Grace', 'Njeri', '2002-06-18', 'F', '56 Nyeri', '0778901234', 'grace@student.com', 'in session'),
+    -> ('Henry', 'Mbugua', '1998-12-12', 'M', '89 Machakos', '0789012345', 'henry@student.com', 'completed'),
+    -> ('Ivy', 'Wangari', '2001-04-22', 'F', '23 Meru', '0790123456', 'ivy@student.com', 'in session'),
+    -> ('James', 'Kipchoge', '2000-08-08', 'M', '67 Kitale', '0701234567', 'james@student.com', 'in session');
+Query OK, 10 rows affected (0.02 sec)
+Records: 10  Duplicates: 0  Warnings: 0
+
+mysql> CREATE TABLE Courses (course_id INT PRIMARY KEY AUTO_INCREMENT,
+    -> course_name VARCHAR(100) NOT NULL,
+    -> course_type VARCHAR(20) NOT NULL,
+    -> duration_months INT);
+Query OK, 0 rows affected (0.07 sec)
+
+mysql> INSERT INTO Courses (course_name, course_type, duration_months) VALUES
+    -> ('Computer Science', 'diploma', 36),
+    -> ('Business Management', 'diploma', 36),
+    -> ('Electrical Engineering', 'certificate', 24),
+    -> ('Hospitality Management', 'certificate', 24),
+    -> ('Carpentry', 'artisan', 12),
+    -> ('Welding', 'artisan', 12);
+Query OK, 6 rows affected (0.02 sec)
+Records: 6  Duplicates: 0  Warnings: 0
+
+mysql> CREATE TABLE Subjects (subject_id INT PRIMARY KEY AUTO_INCREMENT,
+    -> subject_code VARCHAR(20) UNIQUE,
+    -> subject_name VARCHAR(100) NOT NULL,
+    -> module_code VARCHAR(20),
+    -> weekly_hours INT CHECK (weekly_hours BETWEEN 2 AND 6),
+    -> department_id INT,
+    -> FOREIGN KEY (department_id) REFERENCES Departments(department_id));
+Query OK, 0 rows affected (0.11 sec)
+
+mysql> INSERT INTO Subjects (subject_code, subject_name, module_code, weekly_hours, department_id) VALUES
+    -> ('CS101', 'Programming Basics', 'MOD1', 4, 1),
+    -> ('CS102', 'Database Systems', 'MOD1', 5, 1),
+    -> ('BS101', 'Accounting', 'MOD1', 3, 2),
+    -> ('BS102', 'Marketing', 'MOD1', 4, 2),
+    -> ('ENG101', 'Circuit Analysis', 'MOD1', 5, 3);
+Query OK, 5 rows affected (0.02 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql> CREATE TABLE Assessments (assessment_id INT PRIMARY KEY AUTO_INCREMENT,
+    -> student_id INT,
+    -> subject_id INT,
+    -> term INT,
+    -> year INT,
+    -> cat1_score DECIMAL(5,2) CHECK (cat1_score BETWEEN 0 AND 20),
+    -> cat2_score DECIMAL(5,2) CHECK (cat2_score BETWEEN 0 AND 20),
+    -> exam_score DECIMAL(5,2) CHECK (exam_score BETWEEN 0 AND 60),
+    -> attendance_percentage DECIMAL(5,2),
+    -> FOREIGN KEY (student_id) REFERENCES students(student_id),
+    -> FOREIGN KEY (subject_id) REFERENCES subjects(scubject_id));
+ERROR 3734 (HY000): Failed to add the foreign key constraint. Missing column 'scubject_id' for constraint 'assessments_ibfk_2' in the referenced table 'subjects'
+mysql> SHOW TABLES;
++-----------------------------+
+| Tables_in_studentservicesdb |
++-----------------------------+
+| courses                     |
+| departments                 |
+| students                    |
+| subjects                    |
++-----------------------------+
+4 rows in set (0.04 sec)
+
+mysql> DESCRIBE Subjects;
++---------------+--------------+------+-----+---------+----------------+
+| Field         | Type         | Null | Key | Default | Extra          |
++---------------+--------------+------+-----+---------+----------------+
+| subject_id    | int          | NO   | PRI | NULL    | auto_increment |
+| subject_code  | varchar(20)  | YES  | UNI | NULL    |                |
+| subject_name  | varchar(100) | NO   |     | NULL    |                |
+| module_code   | varchar(20)  | YES  |     | NULL    |                |
+| weekly_hours  | int          | YES  |     | NULL    |                |
+| department_id | int          | YES  | MUL | NULL    |                |
++---------------+--------------+------+-----+---------+----------------+
+6 rows in set (0.03 sec)
+
+mysql> DROP TABLE IF EXISTS Assessments;
+Query OK, 0 rows affected, 1 warning (0.01 sec)
+
+mysql> CREATE TABLE Assessments (assessment_id INT PRIMARY KEY AUTO_INCREMENT,
+    -> student_id INT,
+    -> subject_id INT,
+    -> term INT,
+    -> year INT,
+    -> cat1_score DECIMAL(5,2) CHECK (cat1_score BETWEEN 0 AND 20),
+    -> cat2_score DECIMAL(5,2) CHECK (cat2_score BETWEEN 0 AND 20),
+    -> exam_score DECIMAL(5,2) CHECK (exam_score BETWEEN 0 AND 60),
+    -> attendance_percentage DECIMAL(5,2),
+    -> FOREIGN KEY (student_id) REFERENCES 'students'(student_id),
+    -> FOREIGN KEY (subject_id) REFERENCES 'subjects'(subject_id));
+ERROR 1064 (42000): You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near ''students'(student_id),
+FOREIGN KEY (subject_id) REFERENCES 'subjects'(subject_i' at line 10
+mysql> DROP TABLE IF EXISTS Assessments;
+Query OK, 0 rows affected, 1 warning (0.01 sec)
+
+mysql> CREATE TABLE Assessments (assessment_id INT PRIMARY KEY AUTO_INCREMENT,
+    -> student_id INT,
+    -> subject_id INT,
+    -> term INT,
+    -> year INT,
+    -> cat1_score DECIMAL(5,2) CHECK (cat1_score BETWEEN 0 AND 20),
+    -> cat2_score DECIMAL(5,2) CHECK (cat2_score BETWEEN 0 AND 20),
+    -> exam_score DECIMAL(5,2) CHECK (exam_score BETWEEN 0 AND 60),
+    -> attendance_percentage DECIMAL(5,2),
+    -> FOREIGN KEY (student_id) REFERENCES `students`(student_id),
+    -> FOREIGN KEY (subject_id) REFERENCES `subjects`(subject_id));
+Query OK, 0 rows affected (0.11 sec)
+
+mysql> INSERT INTO Assessments (student_id, subject_id, term, year, cat1_score, cat2_score, exam_score, attendance_percentage) VALUES
+    -> (1, 1, 1, 2024, 18, 19, 55, 85),
+    -> (2, 1, 1, 2024, 15, 14, 42, 78),
+    -> (3, 1, 1, 2024, 12, 13, 35, 65),
+    -> (4, 2, 1, 2024, 16, 17, 48, 90),
+    -> (5, 2, 1, 2024, 14, 15, 52, 88),
+    -> (1, 2, 1, 2024, 17, 16, 50, 82),
+    -> (2, 2, 1, 2024, 13, 12, 38, 70),
+    -> (6, 3, 1, 2024, 11, 14, 32, 60),
+    -> (7, 3, 1, 2024, 19, 18, 58, 95),
+    -> (8, 4, 1, 2024, 15, 16, 45, 85);
+Query OK, 10 rows affected (0.03 sec)
+Records: 10  Duplicates: 0  Warnings: 0
+
+mysql> SELECT * FROM Students WHERE first_name LIKE 'A%';
++------------+------------+-----------+---------------+--------+-------------+------------+-------------------+-------------------+
+| student_id | first_name | last_name | date_of_birth | gender | address     | phone      | email             | enrollment_status |
++------------+------------+-----------+---------------+--------+-------------+------------+-------------------+-------------------+
+|          1 | Alice      | Wanjiku   | 2000-05-15    | F      | 123 Nairobi | 0712345678 | alice@student.com | in session        |
++------------+------------+-----------+---------------+--------+-------------+------------+-------------------+-------------------+
+1 row in set (0.01 sec)
+
+mysql> SELECT * FROM Departments WHERE location_block = 'Block A';
++---------------+------------------+----------------+--------------------+
+| department_id | department_name  | location_block | head_of_department |
++---------------+------------------+----------------+--------------------+
+|             1 | Computer Science | Block A        | Dr. Jane Smith     |
++---------------+------------------+----------------+--------------------+
+1 row in set (0.01 sec)
+
+mysql> SELECT * FROM Students WHERE enrollment_status = 'on attachment';
++------------+------------+-----------+---------------+--------+------------+------------+-------------------+-------------------+
+| student_id | first_name | last_name | date_of_birth | gender | address    | phone      | email             | enrollment_status |
++------------+------------+-----------+---------------+--------+------------+------------+-------------------+-------------------+
+|          3 | Carol      | Muthoni   | 1999-11-10    | F      | 78 Mombasa | 0734567890 | carol@student.com | on attachment     |
+|          6 | Frank      | Omondi    | 2000-01-05    | M      | 34 Thika   | 0767890123 | frank@student.com | on attachment     |
++------------+------------+-----------+---------------+--------+------------+------------+-------------------+-------------------+
+2 rows in set (0.00 sec)
+
+mysql> SELECT s.first_name, s.last_name, sub.subject_name, a.cat1_score, a.cat2_score, a.exam_score
+    -> FROM Students s
+    -> JOIN Assessments a ON s.student_id = a.student_id
+    -> JOIN Subjects sub ON a.subject_id = sub.subject_id;
++------------+-----------+--------------------+------------+------------+------------+
+| first_name | last_name | subject_name       | cat1_score | cat2_score | exam_score |
++------------+-----------+--------------------+------------+------------+------------+
+| Alice      | Wanjiku   | Programming Basics |      18.00 |      19.00 |      55.00 |
+| Bob        | Otieno    | Programming Basics |      15.00 |      14.00 |      42.00 |
+| Carol      | Muthoni   | Programming Basics |      12.00 |      13.00 |      35.00 |
+| David      | Kimani    | Database Systems   |      16.00 |      17.00 |      48.00 |
+| Emma       | Achieng   | Database Systems   |      14.00 |      15.00 |      52.00 |
+| Alice      | Wanjiku   | Database Systems   |      17.00 |      16.00 |      50.00 |
+| Bob        | Otieno    | Database Systems   |      13.00 |      12.00 |      38.00 |
+| Frank      | Omondi    | Accounting         |      11.00 |      14.00 |      32.00 |
+| Grace      | Njeri     | Accounting         |      19.00 |      18.00 |      58.00 |
+| Henry      | Mbugua    | Marketing          |      15.00 |      16.00 |      45.00 |
++------------+-----------+--------------------+------------+------------+------------+
+10 rows in set (0.01 sec)
+
+mysql> SELECT course_type, COUNT(*) as total_students
+    -> FROM courses c
+    -> JOIN Students s ON c.course_id = s.course_id
+    -> GROUP BY course_type;
+ERROR 1054 (42S22): Unknown column 's.course_id' in 'on clause'
+mysql> ALTER TABLE Students ADD COLUMN course_id INT;
+Query OK, 0 rows affected (0.13 sec)
+Records: 0  Duplicates: 0  Warnings: 0
+
+mysql> ALTER TABLE Students ADD FOREIGN KEY (course_id) REFERENCES courses(course_id);
+Query OK, 10 rows affected (0.29 sec)
+Records: 10  Duplicates: 0  Warnings: 0
+
+mysql> UPDATE Students SET course_id = 1 WHERE student_id BETWEEN 1 AND 2;
+Query OK, 2 rows affected (0.02 sec)
+Rows matched: 2  Changed: 2  Warnings: 0
+
+mysql> UPDATE Students SET course_id = 2 WHERE student_id BETWEEN 3 AND 4;
+Query OK, 2 rows affected (0.01 sec)
+Rows matched: 2  Changed: 2  Warnings: 0
+
+mysql> UPDATE Students SET course_id = 3 WHERE student_id BETWEEN 5 AND 6;
+Query OK, 2 rows affected (0.01 sec)
+Rows matched: 2  Changed: 2  Warnings: 0
+
+mysql> UPDATE Students SET course_id = 4 WHERE student_id BETWEEN 7 AND 8;
+Query OK, 2 rows affected (0.01 sec)
+Rows matched: 2  Changed: 2  Warnings: 0
+
+mysql> UPDATE Students SET course_id = 5 WHERE student_id BETWEEN 9 AND 10;
+Query OK, 2 rows affected (0.01 sec)
+Rows matched: 2  Changed: 2  Warnings: 0
+
+mysql> SELECT course_type, COUNT(*) as total_students
+    -> FROM courses c
+    -> JOIN Students s ON c.course_id = s.course_id
+    -> GROUP BY course_type;
++-------------+----------------+
+| course_type | total_students |
++-------------+----------------+
+| diploma     |              4 |
+| certificate |              4 |
+| artisan     |              2 |
++-------------+----------------+
+3 rows in set (0.01 sec)
+
+mysql> G
+    ->
